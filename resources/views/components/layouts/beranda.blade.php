@@ -36,11 +36,24 @@
             <div class="container mx-auto px-4 py-6">
 
                 {{-- Navbar --}}
-                <div class="w-full flex flex-row items-center justify-between mb-8 max-w-4xl mx-auto">
-                    <div class="flex-1 flex justify-center">
+                <div x-data="{ sidebarOpen: false }" class="w-full">
+                    {{-- Top Navbar --}}
+                    <div class="flex items-center justify-between bg-[#0B0B15] text-white h-14 px-4 md:hidden">
+                        <a href="/" class="text-white font-italiana text-lg">CARI CAFE</a>
+                        <button @click="sidebarOpen = !sidebarOpen" class="focus:outline-none">
+                            <!-- Hamburger Icon -->
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M4 6h16M4 12h16M4 18h16" />
+                            </svg>
+                        </button>
+                    </div>
+
+                    {{-- Desktop Navbar --}}
+                    <div class="hidden md:flex w-full flex-row items-center justify-between mb-8 max-w-4xl mx-auto">
                         <div
                             class="bg-[#0B0B15] rounded-full flex w-full max-w-4xl h-10 items-center justify-between px-2 sm:px-4 md:px-6">
-
                             <a href="/" class="text-sm text-white px-2 py-1 font-italiana">CARI CAFE</a>
 
                             <div class="flex items-center space-x-2">
@@ -53,7 +66,6 @@
 
                             @if (auth()->check())
                                 <div x-data="{ open: false }" class="relative ml-4">
-                                    {{-- Tombol Ikon Profil --}}
                                     <button @click="open = !open"
                                         class="flex items-center justify-center w-10 h-10 rounded-full bg-[#0B0B15] text-white shadow hover:bg-[#23233a] transition">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none"
@@ -62,8 +74,6 @@
                                                 d="M5.121 17.804A4 4 0 017 17h10a4 4 0 011.879.804M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                                         </svg>
                                     </button>
-
-                                    {{-- Dropdown Menu --}}
                                     <div x-show="open" @click.away="open = false"
                                         class="absolute right-0 mt-2 w-40 bg-white rounded-lg shadow-lg z-50 text-sm text-gray-800 overflow-hidden">
                                         <a href="/editProfile" class="block px-4 py-2 hover:bg-gray-100 transition">Edit
@@ -80,7 +90,35 @@
                             @endif
                         </div>
                     </div>
+
+                    {{-- Mobile Sidebar --}}
+                    <div x-show="sidebarOpen" @click.away="sidebarOpen = false"
+                        class="fixed inset-0 bg-black bg-opacity-50 z-50 flex md:hidden">
+                        <div class="w-64 bg-white p-6 space-y-4 text-gray-800">
+                            <div class="flex justify-between items-center mb-4">
+                                <span class="font-bold text-lg">Menu</span>
+                                <button @click="sidebarOpen = false">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                </button>
+                            </div>
+                            <a href="/" class="block px-2 py-1 hover:bg-gray-100 rounded">Home Page</a>
+                            @if (auth()->check())
+                                <a href="/rankings" class="block px-2 py-1 hover:bg-gray-100 rounded">Ranking</a>
+                                <a href="/rekomendasis"
+                                    class="block px-2 py-1 hover:bg-gray-100 rounded">Rekomendasi</a>
+                                <a href="/editProfile" class="block px-2 py-1 hover:bg-gray-100 rounded">Edit Profil</a>
+                                <a href="/logout" class="block px-2 py-1 hover:bg-gray-100 rounded">Logout</a>
+                            @else
+                                <a href="/login" class="block px-2 py-1 hover:bg-gray-100 rounded">Login</a>
+                            @endif
+                        </div>
+                    </div>
                 </div>
+
 
                 {{-- Konten halaman --}}
                 {{ $slot }}
