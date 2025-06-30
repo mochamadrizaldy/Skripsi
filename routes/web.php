@@ -61,6 +61,8 @@ Route::middleware('auth')->group(function () {
         Volt::route('/alternatif', 'alternatif.index');
         Volt::route('/alternatif/create', 'alternatif.create');
         Volt::route('/alternatif/{id}/edit', 'alternatif.edit');
+        Volt::route('/rangking', 'rangking.index');
+        Volt::route('/rangking/perhitungan', 'rangking.perhitungan');
     });
 
     Route::middleware('role:2')->group(function () {

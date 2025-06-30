@@ -52,14 +52,26 @@
                             </div>
 
                             @if (auth()->check())
-                                <a href="/editProfile"
-                                    class="ml-4 bg-[#0B0B15] text-white text-sm font-semibold px-4 py-2 rounded-full shadow hover:bg-[#23233a] transition whitespace-nowrap">
-                                    Edit Profile
-                                </a>
-                                <a href="/logout"
-                                    class="ml-4 bg-[#0B0B15] text-white text-sm font-semibold px-4 py-2 rounded-full shadow hover:bg-[#23233a] transition whitespace-nowrap">
-                                    Logout
-                                </a>
+                                <div x-data="{ open: false }" class="relative ml-4">
+                                    {{-- Tombol Ikon Profil --}}
+                                    <button @click="open = !open"
+                                        class="flex items-center justify-center w-10 h-10 rounded-full bg-[#0B0B15] text-white shadow hover:bg-[#23233a] transition">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none"
+                                            viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M5.121 17.804A4 4 0 017 17h10a4 4 0 011.879.804M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                        </svg>
+                                    </button>
+
+                                    {{-- Dropdown Menu --}}
+                                    <div x-show="open" @click.away="open = false"
+                                        class="absolute right-0 mt-2 w-40 bg-white rounded-lg shadow-lg z-50 text-sm text-gray-800 overflow-hidden">
+                                        <a href="/editProfile" class="block px-4 py-2 hover:bg-gray-100 transition">Edit
+                                            Profil</a>
+                                        <a href="/logout"
+                                            class="block px-4 py-2 hover:bg-gray-100 transition">Logout</a>
+                                    </div>
+                                </div>
                             @else
                                 <a href="/login"
                                     class="ml-4 bg-[#0B0B15] text-white text-sm font-semibold px-4 py-2 rounded-full shadow hover:bg-[#23233a] transition whitespace-nowrap">
