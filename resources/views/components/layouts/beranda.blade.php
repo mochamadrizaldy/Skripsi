@@ -37,9 +37,10 @@
 
                 {{-- Navbar --}}
                 <div x-data="{ sidebarOpen: false }" class="w-full">
-                    {{-- Top Navbar --}}
+                    {{-- Navbar Mobile Only --}}
                     <div class="flex items-center justify-between bg-[#0B0B15] text-white h-14 px-4 md:hidden">
                         <a href="/" class="text-white font-italiana text-lg">CARI CAFE</a>
+
                         <button @click="sidebarOpen = !sidebarOpen" class="focus:outline-none">
                             <!-- Hamburger Icon -->
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
@@ -49,6 +50,7 @@
                             </svg>
                         </button>
                     </div>
+
 
                     {{-- Desktop Navbar --}}
                     <div class="hidden md:flex w-full flex-row items-center justify-between mb-8 max-w-4xl mx-auto">
