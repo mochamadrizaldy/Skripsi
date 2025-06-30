@@ -79,7 +79,7 @@
 
                     <x-menu-separator />
 
-                    <x-menu-item title="Dashboard" icon="fas.tachometer-alt" link="/" />
+                    <x-menu-item title="Dashboard" icon="fas.tachometer-alt" link="/dashboard" />
 
                     @if (auth()->user()->role_id == 1)
                         <x-menu-sub title="User Management" icon="fas.users-cog">

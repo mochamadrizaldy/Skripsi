@@ -40,7 +40,7 @@ extends Component {
             request()->session()->regenerate();
 
             session()->flash('success', 'Email berhasil diverifikasi!');
-            return redirect()->intended('/');
+            return redirect()->intended('/dashboard');
         }
 
         return redirect()
@@ -70,7 +70,7 @@ extends Component {
         <x-slot:actions class="flex justify-between">
             <x-button label="Kirim Ulang Email" type="submit" icon="fas.sync" class="btn-primary"
                 spinner="sendVerificationEmail" />
-            <x-button label="Kembali" class="btn-secondary" link="/" />
+            <x-button label="Kembali" class="btn-secondary" link="/dashboard" />
         </x-slot:actions>
     </x-form>
 </div>

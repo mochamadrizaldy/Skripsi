@@ -5,7 +5,8 @@ use Livewire\Attributes\Rule;
 use Livewire\Attributes\Title;
 use Livewire\Volt\Component;
 
-new #[Layout('components.layouts.empty')] #[Title('Login')] class // <-- Here is the `empty` layout
+new #[Layout('components.layouts.empty')] #[Title('Login')] class
+    // <-- Here is the `empty` layout
     extends Component {
     #[Rule('required|email')]
     public string $email = '';
@@ -17,7 +18,11 @@ new #[Layout('components.layouts.empty')] #[Title('Login')] class // <-- Here is
     {
         if (auth()->check()) {
             $user = auth()->user();
-            return redirect('/');
+            if (auth()->user()->role_id == 1) {
+                return redirect('/dashboard');
+            } else {
+                return redirect('/');
+            }
         }
     }
 
@@ -34,7 +39,11 @@ new #[Layout('components.layouts.empty')] #[Title('Login')] class // <-- Here is
             session()->flash('success', 'Selamat Anda berhasil login!');
 
             $user = auth()->user();
-            return redirect('/');
+            if (auth()->user()->role_id == 1) {
+                return redirect('/dashboard');
+            } else {
+                return redirect('/');
+            }
         }
 
         $this->addError('email', 'The provided credentials do not match our records.');
@@ -44,13 +53,15 @@ new #[Layout('components.layouts.empty')] #[Title('Login')] class // <-- Here is
 ?>
 
 <div class="md:w-96 mx-auto mt-20">
-    <div class="flex items-center gap-2 mb-6">
-        <x-icon name="o-square-3-stack-3d" class="w-6 -mb-1 text-orange-500" />
-        <span
-            class="font-bold text-3xl me-3 bg-gradient-to-r from-red-500 to-orange-300 bg-clip-text text-transparent ">
-            SPK CAFE
-        </span>
-    </div>
+    <a href="{{ url('/') }}">
+        <div class="flex items-center gap-2 mb-6">
+            <x-icon name="o-square-3-stack-3d" class="w-6 -mb-1 text-orange-500" />
+            <span
+                class="font-bold text-3xl me-3 bg-gradient-to-r from-red-500 to-orange-300 bg-clip-text text-transparent">
+                SPK CAFE
+            </span>
+        </div>
+    </a>
 
     <x-form wire:submit="login">
         <x-input label="E-mail" wire:model="email" icon="o-envelope" inline />

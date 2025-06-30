@@ -60,7 +60,7 @@ new #[Layout('components.layouts.beranda')] #[Title('Rekomendasi')] class extend
                     <label class="block text-sm font-medium text-gray-700 mb-1">{{ $kriteria->name }}</label>
                     <select wire:model.live="filters.{{ $kriteria->id }}"
                         class="w-full border border-gray-300 bg-gray-100 rounded-md shadow-sm focus:ring focus:ring-blue-200 focus:outline-none px-3 py-2 text-sm">
-                        <option value="">Pilih {{ $kriteria->name }}</option>
+                        {{-- <option value="">Pilih {{ $kriteria->name }}</option> --}}
                         @foreach ($kriteria->sub_kriteria as $sub)
                             <option value="{{ $sub->id }}">{{ $sub->name }}</option>
                         @endforeach

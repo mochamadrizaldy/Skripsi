@@ -29,13 +29,13 @@ new #[Layout('components.layouts.empty')] #[Title('Login')] class
     public $photo;
 
     public string $avatar = '';
-    public int $role_id = 4;
+    public int $role_id = 2;
 
     public function mount()
     {
         // It is logged in
         if (auth()->user()) {
-            return redirect('/');
+            return redirect('/dashboard');
         }
     }
 
@@ -57,8 +57,11 @@ new #[Layout('components.layouts.empty')] #[Title('Login')] class
         auth()->login($user);
         request()->session()->regenerate();
         session()->flash('success', 'Selamat akun Anda berhasil dibuat!');
-
-        return redirect()->intended('/');
+        if (auth()->user()->role_id == 1) {
+            return redirect()->intended('/dashboard');
+        } else {
+            return redirect()->intended('/');
+        }
     }
 };
 

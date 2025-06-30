@@ -144,20 +144,17 @@ new class extends Component {
         <div class="grid gap-5">
             @foreach ($kriterias as $kriteria)
                 @php
-                    $options = collect() // Tambah opsi "All" di awal
-                        ->merge(
-                            $kriteria->sub_kriteria->map(function ($sub) {
-                                return [
-                                    'id' => $sub->id,
-                                    'name' => $sub->name,
-                                ];
-                            }),
-                        )
+                    $options = $kriteria->sub_kriteria
+                        ->map(function ($sub) {
+                            return [
+                                'id' => $sub->id,
+                                'name' => $sub->name,
+                            ];
+                        })
                         ->toArray();
                 @endphp
 
-                <x-select label="{{ $kriteria->name }}" wire:model.live="filters.{{ $kriteria->id }}" :options="$options"
-                    placeholder="Pilih {{ $kriteria->name }}" clearable />
+                <x-select label="{{ $kriteria->name }}" wire:model.live="filters.{{ $kriteria->id }}" :options="$options" clearable />
             @endforeach
         </div>
 

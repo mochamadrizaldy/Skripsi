@@ -5,6 +5,8 @@ use Illuminate\Support\Facades\Route;
 use Livewire\Volt\Volt;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 
+Volt::route('/', 'guest.beranda');
+
 // ======================
 // 👤 GUEST ROUTES
 // ======================
@@ -15,19 +17,6 @@ Route::middleware('guest')->group(function () {
     Volt::route('/reset-password/{token}', 'auth.password-reset')->name('password.reset');
 });
 
-// Route::get('/beranda', function () {
-//     return view('components.users.beranda');
-// });
-// Route::get('/ranking', function () {
-//     return view('components.users.rankings');
-// });
-// Route::get('/rekomendasis', function () {
-//     return view('components.users.rekomendasis');
-// });
-
-Volt::route('/beranda', 'guest.beranda');
-Volt::route('/rankings', 'guest.rangking');
-Volt::route('/rekomendasis', 'guest.rekomendasi');
 
 // ======================
 // 🔓 LOGOUT
@@ -51,7 +40,7 @@ Route::middleware('auth')->group(function () {
         return redirect('/')->with('success', 'Email berhasil diverifikasi!');
     })->middleware('signed')->name('verification.verify');
 
-    Volt::route('/', 'index');
+    Volt::route('/dashboard', 'index');
     // ======================
     // 🛡️ ADMIN ROUTES - akses penuh
     // ======================
@@ -74,11 +63,10 @@ Route::middleware('auth')->group(function () {
         Volt::route('/alternatif/{id}/edit', 'alternatif.edit');
     });
 
-    Route::middleware('role:1,2')->group(function () {
+    Route::middleware('role:2')->group(function () {
 
-        Volt::route('/rangking', 'rangking.index');
-        Volt::route('/rangking/perhitungan', 'rangking.perhitungan');
-
-        Volt::route('/rekomendasi', 'rekomendasi.index');
+        Volt::route('/rankings', 'guest.rangking');
+        Volt::route('/rekomendasis', 'guest.rekomendasi');
+        Volt::route('/editProfile', 'guest.editprofile');
     });
 });

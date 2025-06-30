@@ -67,8 +67,6 @@ new class extends Component {
             $this->user->update(['avatar' => "/storage/$url"]);
         }
 
-        logActivity('updated', 'Merubah data useer ' . $this->user->name);
-
         // You can toast and redirect to any route
         $this->success('User updated with success.', redirectTo: '/users');
     }

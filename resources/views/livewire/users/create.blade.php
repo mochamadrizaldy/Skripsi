@@ -63,8 +63,6 @@ new class extends Component {
         // Create
         $user = User::create($data);
 
-        logActivity('created', $user->name . ' ditambahkan');
-
         // You can toast and redirect to any route
         $this->success('User berhasil dibuat!', redirectTo: '/users');
     }

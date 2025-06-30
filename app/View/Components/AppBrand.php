@@ -23,7 +23,7 @@ class AppBrand extends Component
     {
         if (auth()->user()->role_id !== 4) {
             return <<<'HTML'
-                <a href="/" wire:navigate class="flex items-center">
+                <a href="/dashboard" wire:navigate class="flex items-center">
                     <!-- Hidden when collapsed -->
                     <div {{ $attributes->class(["hidden-when-collapsed"]) }}>
                         <div class="flex items-center gap-2">
@@ -43,7 +43,7 @@ class AppBrand extends Component
             HTML;
         } else {
             return <<<'HTML'
-                <a href="/" wire:navigate class="flex items-center">
+                <a href="/dashboard" wire:navigate class="flex items-center">
                     <!-- Hidden when collapsed -->
                     <div {{ $attributes->class(["hidden-when-collapsed"]) }}>
                         <div class="flex items-center gap-2">

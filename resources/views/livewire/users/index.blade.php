@@ -42,7 +42,6 @@ new class extends Component {
         if ($user->avatar && file_exists(public_path($user->avatar))) {
             unlink(public_path($user->avatar));
         }
-        logActivity('deleted', 'Menghapus data user ' . $user->name);
         $user->delete();
         $this->warning("User $user->name akan dihapus", position: 'toast-top');
     }

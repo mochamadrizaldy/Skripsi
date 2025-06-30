@@ -48,7 +48,6 @@ new class extends Component {
     public function delete($id): void
     {
         $kategori = Role::findOrFail($id);
-        logActivity('deleted', 'Menghapus role ' . $kategori->name);
         $kategori->delete();
         $this->warning("Role $kategori->name akan dihapus", position: 'toast-top');
     }
@@ -67,7 +66,6 @@ new class extends Component {
         
         Role::create(['name' => $this->newRoleName]);
         
-        logActivity('created', $this->newRoleName . ' ditambahkan');
         $this->createModal = false;
         $this->success('Role created successfully.', position: 'toast-top');
     }
@@ -87,8 +85,6 @@ new class extends Component {
         if ($this->editingRole) {
             $this->editingRole->update(['name' => $this->editingName, 'updated_at' => now()]);
             $this->editModal = false;
-
-            logActivity('updated', 'Merubah data role ' . $this->editingName);
             $this->success('Role updated successfully.', position: 'toast-top');
         }
     }
