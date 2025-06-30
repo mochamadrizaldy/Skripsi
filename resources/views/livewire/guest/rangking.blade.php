@@ -55,7 +55,7 @@ new #[Layout('components.layouts.beranda')] #[Title('Beranda')] class extends Co
     </div>
 
     <div class="bg-white rounded-xl shadow-md px-6 py-10">
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
+        <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-6">
             @foreach ($rankings as $ranking)
                 @php $cafe = $ranking->cafe; @endphp
                 <div class="bg-[#FCF9F4] rounded-lg shadow p-4 cursor-pointer transition hover:scale-105"
