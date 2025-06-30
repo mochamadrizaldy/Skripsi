@@ -65,8 +65,8 @@ new #[Layout('components.layouts.beranda')] #[Title('Beranda')] class extends Co
                     <h3 class="text-lg font-bold">{{ $cafe->name }}</h3>
                     <p class="text-sm">Peringkat: {{ $ranking->peringkat }}</p>
                     <p class="text-sm">Sosmed: {{ $cafe->sosmed }}</p>
-                    <p class="text-sm">Lat: {{ $cafe->latitude }}</p>
-                    <p class="text-sm">Long: {{ $cafe->longitude }}</p>
+                    <p class="text-sm">Latitude: {{ $cafe->latitude }}</p>
+                    <p class="text-sm">Longitude: {{ $cafe->longitude }}</p>
                 </div>
             @endforeach
         </div>
