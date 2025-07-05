@@ -30,7 +30,7 @@ class AppBrand extends Component
                             <x-icon name="o-square-3-stack-3d" class="w-6 sm:w-5 -mb-1 text-red-500" />
                             <span class="font-bold text-2xl sm:text-xl md:text-2xl lg:text-3xl 
                                         bg-gradient-to-r from-red-500 to-yellow-300 bg-clip-text text-transparent">
-                                Cafe SPK
+                                CariCafe
                             </span>
                         </div>
                     </div>
@@ -50,7 +50,7 @@ class AppBrand extends Component
                             <x-icon name="o-square-3-stack-3d" class="w-6 sm:w-5 -mb-1 text-red-500" />
                             <span class="font-bold text-2xl sm:text-xl md:text-2xl lg:text-3xl 
                                         bg-gradient-to-r from-yellow-500 to-pink-300 bg-clip-text text-transparent">
-                                Ngawulo
+                                CariCafe
                             </span>
                         </div>
                     </div>

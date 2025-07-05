@@ -58,7 +58,7 @@ new #[Layout('components.layouts.empty')] #[Title('Login')] class
             <x-icon name="o-square-3-stack-3d" class="w-6 -mb-1 text-orange-500" />
             <span
                 class="font-bold text-3xl me-3 bg-gradient-to-r from-red-500 to-orange-300 bg-clip-text text-transparent">
-                SPK CAFE
+                Login
             </span>
         </div>
     </a>
