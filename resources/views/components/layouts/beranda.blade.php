@@ -121,7 +121,12 @@
                     </div>
                 </div>
 
-
+                <script>
+                    window.initMap = function() {
+                        const event = new CustomEvent('google-maps-ready');
+                        window.dispatchEvent(event);
+                    };
+                </script>
                 {{-- Konten halaman --}}
                 {{ $slot }}
             </div>
@@ -132,6 +137,8 @@
     <x-toast />
 
     @livewireScripts
+    <script async defer
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA_RaFzN-2uez7swhZmlBPHKZmtKofRBWM&callback=initMap"></script>
 </body>
 
 </html>

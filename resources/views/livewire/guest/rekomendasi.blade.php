@@ -12,30 +12,89 @@ new #[Layout('components.layouts.beranda')] #[Title('Rekomendasi')] class extend
 
     public string $search = '';
     public array $filters = [];
+    public float $userLat = -7.94666; // default Malang
+    public float $userLng = 112.6145;
+    public bool $gpsUsed = false;
 
     public function clear(): void
     {
         $this->reset(['filters', 'search']);
         $this->success('Filter direset.', position: 'toast-top');
     }
+    public function haversineDistance($lat1, $lon1, $lat2, $lon2): float
+    {
+        $earthRadius = 6371; // km
+
+        $dLat = deg2rad($lat2 - $lat1);
+        $dLon = deg2rad($lon2 - $lon1);
+
+        $a = sin($dLat / 2) ** 2 + cos(deg2rad($lat1)) * cos(deg2rad($lat2)) * sin($dLon / 2) ** 2;
+
+        $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
+        return $earthRadius * $c;
+    }
 
     public function filteredCafes()
     {
         $query = Cafe::with(['alternatifs.kriteria'])->with('alternatifs');
         $kriterias = Kriteria::with('sub_kriteria')->get();
+        // dd($query->get()->toArray(), $kriterias->toArray());
+        return $query
+            ->get()
+            ->filter(function ($cafe) use ($kriterias) {
+                // hitung jarak cafe
+                $distance = $this->haversineDistance($this->userLat, $this->userLng, $cafe->latitude, $cafe->longitude);
+                $cafe->distance = $distance;
 
-        return $query->get()->filter(function ($cafe) use ($kriterias) {
-            foreach ($this->filters as $kriteriaId => $subId) {
-                $alt = $cafe->alternatifs->firstWhere('kriteria_id', $kriteriaId);
-                $kriteria = $kriterias->firstWhere('id', $kriteriaId);
-                $sub = $kriteria?->sub_kriteria->firstWhere('nilai', $alt->value ?? null);
+                // cek apakah ada filter
+                foreach ($this->filters as $kriteriaId => $subId) {
+                    $alt = $cafe->alternatifs->firstWhere('kriteria_id', $kriteriaId);
+                    $kriteria = $kriterias->firstWhere('id', $kriteriaId);
 
-                if (!$sub || $sub->id != $subId) {
-                    return false;
+                    if ($kriteria->name == 'Jarak') {
+                        // override alt berdasarkan jarak
+                        $sub = $this->getJarakSubKriteria($distance, $kriteria);
+                    } else {
+                        $sub = $kriteria?->sub_kriteria->firstWhere('nilai', $alt->value ?? null);
+                    }
+
+                    if (!$sub || $sub->id != $subId) {
+                        return false;
+                    }
+                }
+                $this->success('Data Terfilter.', position: 'toast-top');
+                return true;
+            })
+            ->sortBy('distance');
+    }
+    public function getJarakSubKriteria(float $distance, $kriteria)
+    {
+        foreach ($kriteria->sub_kriteria as $sub) {
+            $range = $sub->name;
+
+            if (str_contains($range, '<')) {
+                preg_match('/< ?([\d.]+)/', $range, $match);
+                if ($distance < floatval($match[1])) {
+                    return $sub;
                 }
             }
-            return true;
-        });
+
+            if (str_contains($range, 's.d.')) {
+                preg_match('/([\d.]+) s.d. ([\d.]+)/', $range, $match);
+                if ($distance >= floatval($match[1]) && $distance <= floatval($match[2])) {
+                    return $sub;
+                }
+            }
+
+            if (str_contains($range, '>')) {
+                preg_match('/> ?([\d.]+)/', $range, $match);
+                if ($distance > floatval($match[1])) {
+                    return $sub;
+                }
+            }
+        }
+
+        return null;
     }
 
     public function with(): array
@@ -75,13 +134,193 @@ new #[Layout('components.layouts.beranda')] #[Title('Rekomendasi')] class extend
                 </button>
             </div>
         </div>
-
         <!-- Gambar Placeholder -->
-        <div class="flex-1 flex justify-center">
-            <div class="w-72 h-40 bg-gray-200 rounded-lg flex items-center justify-center text-gray-600 text-sm">
-                Gambar / Ilustrasi
+        <div class="flex-1 flex flex-col justify-center">
+
+            <div class="mt-4 flex gap-3 w-full">
+                <button onclick="setToMyLocation()"
+                    class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 text-sm rounded shadow w-full">
+                    Gunakan Lokasi Saya
+                </button>
+
+                <button onclick="resetLocation()"
+                    class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 text-sm rounded shadow w-full">
+                    Reset Lokasi ke Default
+                </button>
             </div>
+            <div class="mt-4 flex gap-3 mb-4 w-full">
+                <p class="text-sm text-gray-600">Jika tidak memilih lokasi maka otomatis akan menggunakan lokasi default
+                </p>
+            </div>
+
+            <div wire:ignore class="w-full h-64 rounded overflow-hidden" id="map"></div>
+
+
+            <script>
+                let map;
+                let marker;
+
+                function createMap(lat, lng) {
+                    const position = {
+                        lat,
+                        lng
+                    };
+
+                    map = new google.maps.Map(document.getElementById("map"), {
+                        center: position,
+                        zoom: 14,
+                    });
+
+                    marker = new google.maps.Marker({
+                        position,
+                        map,
+                        draggable: true,
+                    });
+
+                    marker.addListener("dragend", function(event) {
+                        @this.set('userLat', event.latLng.lat());
+                        @this.set('userLng', event.latLng.lng());
+                    });
+
+                    // Coba pakai lokasi GPS
+                    if (navigator.geolocation) {
+                        navigator.geolocation.getCurrentPosition(
+                            function(position) {
+                                const userPosition = {
+                                    lat: position.coords.latitude,
+                                    lng: position.coords.longitude,
+                                };
+                                map.setCenter(userPosition);
+                                marker.setPosition(userPosition);
+
+                                @this.set('userLat', userPosition.lat);
+                                @this.set('userLng', userPosition.lng);
+                                @this.set('gpsUsed', true);
+                            },
+                            function() {
+                                @this.set('gpsUsed', false);
+                            }
+                        );
+                    }
+                }
+                window.initMap = function() {
+                    const defaultPosition = {
+                        lat: {{ $userLat }},
+                        lng: {{ $userLng }}
+                    };
+
+                    map = new google.maps.Map(document.getElementById("map"), {
+                        center: defaultPosition,
+                        zoom: 14,
+                    });
+
+                    marker = new google.maps.Marker({
+                        position: defaultPosition,
+                        map: map,
+                        draggable: true
+                    });
+
+                    marker.addListener("dragend", function(event) {
+                        @this.set('userLat', event.latLng.lat());
+                        @this.set('userLng', event.latLng.lng());
+                    });
+
+                    if (navigator.geolocation) {
+                        navigator.geolocation.getCurrentPosition(function(position) {
+                            const userPosition = {
+                                lat: position.coords.latitude,
+                                lng: position.coords.longitude
+                            };
+
+                            map.setCenter(userPosition);
+                            marker.setPosition(userPosition);
+
+                            @this.set('userLat', userPosition.lat);
+                            @this.set('userLng', userPosition.lng);
+                            @this.set('gpsUsed', true);
+                        }, function() {
+                            @this.set('gpsUsed', false);
+                        });
+                    }
+                };
+
+                window.addEventListener('google-maps-ready', function() {
+                    const defaultLat = {{ $userLat }};
+                    const defaultLng = {{ $userLng }};
+                    createMap(defaultLat, defaultLng);
+                });
+
+                function setToMyLocation() {
+                    if (navigator.geolocation) {
+                        navigator.geolocation.getCurrentPosition(function(position) {
+                            const userPosition = {
+                                lat: position.coords.latitude,
+                                lng: position.coords.longitude
+                            };
+
+                            // Update posisi marker terlebih dahulu
+                            if (marker) {
+                                marker.setMap(null); // Hapus marker lama
+                            }
+
+                            marker = new google.maps.Marker({
+                                position: userPosition,
+                                map: map,
+                                draggable: true,
+                            });
+
+                            // Tambahkan event dragend lagi
+                            marker.addListener("dragend", function(event) {
+                                @this.set('userLat', event.latLng.lat());
+                                @this.set('userLng', event.latLng.lng());
+                            });
+
+                            map.setCenter(userPosition);
+
+                            // Update ke Livewire
+                            @this.set('userLat', userPosition.lat);
+                            @this.set('userLng', userPosition.lng);
+                        }, function() {
+                            alert("Gagal mendapatkan lokasi.");
+                        });
+                    } else {
+                        alert("Browser tidak mendukung geolokasi.");
+                    }
+                }
+
+                function resetLocation() {
+                    const defaultPosition = {
+                        lat: -7.94666,
+                        lng: 112.61828
+                    };
+
+                    if (marker) {
+                        marker.setMap(null);
+                    }
+
+                    marker = new google.maps.Marker({
+                        position: defaultPosition,
+                        map: map,
+                        draggable: true,
+                    });
+
+                    marker.addListener("dragend", function(event) {
+                        @this.set('userLat', event.latLng.lat());
+                        @this.set('userLng', event.latLng.lng());
+                    });
+
+                    map.setCenter(defaultPosition);
+
+                    @this.set('userLat', defaultPosition.lat);
+                    @this.set('userLng', defaultPosition.lng);
+                }
+            </script>
+
+
+
+
         </div>
+
     </div>
 
     <!-- Daftar Cafe -->
@@ -93,6 +332,11 @@ new #[Layout('components.layouts.beranda')] #[Title('Rekomendasi')] class extend
                         <img src="{{ asset($cafe->gambar) }}" alt="{{ $cafe->name }}"
                             class="w-full h-32 object-cover rounded mb-2">
                         <p class="text-sm font-bold text-center">{{ $cafe->name }}</p>
+                        @if (isset($cafe->distance))
+                            <p class="text-xs text-center text-gray-600">
+                                {{ number_format($cafe->distance, 2) }} km dari posisi kamu
+                            </p>
+                        @endif
                     </div>
                 @empty
                     <p class="col-span-full text-center text-gray-500">Tidak ada cafe yang cocok.</p>

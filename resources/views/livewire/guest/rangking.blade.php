@@ -12,20 +12,42 @@ new #[Layout('components.layouts.beranda')] #[Title('Beranda')] class extends Co
     use WithPagination, Toast;
 
     public int $perPage = 6;
+    public string $search = '';
     public bool $detailModal = false;
     public ?Cafe $selectedCafe = null;
+    public float $originLat = -7.94666; // Polinema
+    public float $originLng = 112.6145;
+
     // public bool $myModal2 = false;
 
     public function updated($property): void
     {
-        if (!is_array($property)) {
+        if (!is_array($property) && $property != '') {
             $this->resetPage();
         }
+    }
+    
+    public function haversineDistance($lat1, $lon1, $lat2, $lon2): float
+    {
+        $earthRadius = 6371; // in kilometers
+
+        $dLat = deg2rad($lat2 - $lat1);
+        $dLon = deg2rad($lon2 - $lon1);
+
+        $a = sin($dLat / 2) ** 2 + cos(deg2rad($lat1)) * cos(deg2rad($lat2)) * sin($dLon / 2) ** 2;
+
+        $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
+        return $earthRadius * $c;
     }
 
     public function getRankingsProperty()
     {
-        return Rangking::with('cafe.alternatifs.kriteria.sub_kriteria')->orderBy('peringkat', 'asc')->paginate($this->perPage);
+        return Rangking::with('cafe.alternatifs.kriteria.sub_kriteria')
+            ->whereHas('cafe', function ($query) {
+                $query->where('name', 'like', '%' . $this->search . '%');
+            })
+            ->orderBy('peringkat', 'asc')
+            ->paginate($this->perPage);
     }
 
     public function showDetail($id): void
@@ -43,14 +65,22 @@ new #[Layout('components.layouts.beranda')] #[Title('Beranda')] class extends Co
             'rankings' => $this->rankings,
         ];
     }
+
 };
 ?>
 
 <div class="min-h-screen w-full max-w-6xl px-4 py-6 mx-auto">
-    <h2 class="text-2xl font-bold mb-6 text-center text-black">Daftar Ranking Cafe</h2>
+    <h2 class="text-2xl font-bold mb-6 text-center text-black">Daftar Ranking Cafe Di Sekitar Polinema</h2>
+    <div class="grid grid-cols-1 md:grid-cols-8 gap-4 items-end mb-4">
 
+        <div class="md:col-span-8">
+            <x-input placeholder="Search..." wire:model.live.debounce="search" clearable icon="o-magnifying-glass"
+                class="" />
+        </div>
+        <!-- Dropdown untuk jumlah data per halaman -->
+    </div>
     <!-- Box dummy -->
-    <div class="flex justify-center mb-10">
+    <div class="flex justify-center my-10">
         <div class="w-56 h-32 bg-gray-200"></div>
     </div>
 
@@ -67,6 +97,11 @@ new #[Layout('components.layouts.beranda')] #[Title('Beranda')] class extends Co
                     <p class="text-sm">Sosmed: {{ $cafe->sosmed }}</p>
                     <p class="text-sm">Latitude: {{ $cafe->latitude }}</p>
                     <p class="text-sm">Longitude: {{ $cafe->longitude }}</p>
+                    <p class="text-sm">
+                        Jarak:
+                        {{ number_format($this->haversineDistance($originLat, $originLng, $cafe->latitude, $cafe->longitude), 2) }}
+                        km
+                    </p>
                 </div>
             @endforeach
         </div>
@@ -125,6 +160,12 @@ new #[Layout('components.layouts.beranda')] #[Title('Beranda')] class extends Co
                         <p><strong>Sosmed:</strong> {{ $selectedCafe->sosmed }}</p>
                         <p><strong>Latitude:</strong> {{ $selectedCafe->latitude }}</p>
                         <p><strong>Longitude:</strong> {{ $selectedCafe->longitude }}</p>
+                        <p><strong>Jarak dari Polinema:</strong>
+                            {{ number_format($this->haversineDistance($originLat, $originLng, $selectedCafe->latitude, $selectedCafe->longitude), 2) }}
+                            km
+                        </p>
+
+
 
                         <hr class="my-2">
 
