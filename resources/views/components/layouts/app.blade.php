@@ -71,6 +71,7 @@
 
                                 <div class="grid grid-rows-2 grid-flow-col gap-4">
                                     <x-button label="Logout" icon="o-power" link="/logout" responsive />
+                                    <x-button label="Profil" icon="o-user" link="/profile" responsive  />
                                     <x-theme-toggle class="btn" label="Theme" responsive />
                                 </div>
                             </x-dropdown>

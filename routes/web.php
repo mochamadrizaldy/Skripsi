@@ -41,6 +41,7 @@ Route::middleware('auth')->group(function () {
     })->middleware('signed')->name('verification.verify');
 
     Volt::route('/dashboard', 'index');
+    Volt::route('/profile', 'auth.editprofile');
     // ======================
     // 🛡️ ADMIN ROUTES - akses penuh
     // ======================
