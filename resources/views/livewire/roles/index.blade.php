@@ -48,6 +48,11 @@ new class extends Component {
     public function delete($id): void
     {
         $kategori = Role::findOrFail($id);
+        // Cek apakah barang masih dipakai di tabel barang_keluars
+        if ($delete->users()->exists()) {
+            $this->error("Role $role->name tidak dapat dihapus karena sudah digunakan dalam data user.", position: 'toast-top');
+            return;
+        }
         $kategori->delete();
         $this->warning("Role $kategori->name akan dihapus", position: 'toast-top');
     }

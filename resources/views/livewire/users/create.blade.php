@@ -103,7 +103,7 @@ new class extends Component {
                 <x-header title="Details" subtitle="More about the user" size="text-2xl" />
             </div>
             <div class="col-span-3 grid gap-3">
-                <x-editor wire:model="bio" label="Bio" hint="Ceritakan sedikit tentang diri Anda" placeholder="Contoh: Saya seorang pengembang web dengan pengalaman 5 tahun." />
+                <x-textarea wire:model="bio" label="Bio" hint="Ceritakan sedikit tentang diri Anda" placeholder="Contoh: Saya seorang pengembang web dengan pengalaman 5 tahun." />
             </div>
         </div>
 

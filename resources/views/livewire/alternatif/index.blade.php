@@ -218,7 +218,7 @@ new class extends Component {
         <x-table :headers="$headers" :rows="$alternatif" :sort-by="$sortBy" with-pagination
             link="alternatif/{cafe_id}/edit">
             @scope('actions', $alternatif)
-            <x-button icon="o-trash" wire:click="delete({{ $alternatif->cafe_id }})"
+            <x-button icon="o-trash" wire:click.stop="delete({{ $alternatif->cafe_id }})"
                 wire:confirm="Yakin ingin menghapus {{ $alternatif->cafe_name }}?" spinner
                 class="btn-ghost btn-sm text-red-500" />
             @endscope

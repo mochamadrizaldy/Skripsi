@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Kriteria;
+use App\Models\SubKriteria;
 use Livewire\Volt\Component;
 use Mary\Traits\Toast;
 use Illuminate\Database\Eloquent\Builder;
@@ -45,66 +46,20 @@ new class extends Component {
     public function delete($id): void
     {
         $kategori = Kriteria::findOrFail($id);
+        
+        // Cek apakah barang masih dipakai di tabel barang_keluars
+        if ($kategori->alternative()->exists()) {
+            $this->error("Kriteria $kategori->name tidak dapat dihapus karena sudah digunakan dalam data alternatif.", position: 'toast-top');
+            return;
+        }
+    
+        // Hapus semua SubKriteria yang terkait dengan Kriteria
+        SubKriteria::where('kriteria_id', $kategori->id)->delete();
+    
+        // Hapus Kriteria
         $kategori->delete();
-        $this->warning("Kriteria $kategori->name akan dihapus", position: 'toast-top');
-    }
-
-    public function create(): void
-    {
-        $this->newkriteriaName = '';
-        $this->newkriteriaKategori = '';
-        $this->newkriteriaBobot = 0;
-        $this->newkriteriaKeterangan = '';
-        $this->createModal = true;
-    }
-
-    public function saveCreate(): void
-    {
-        $this->validate([
-            'newkriteriaName' => 'required|string|max:255',
-            'newkriteriaKategori' => 'required',
-            'newkriteriaBobot' => 'required|numeric',
-            'newkriteriaKeterangan' => 'required',
-        ]);
-
-        Kriteria::create([
-            'name' => $this->newkriteriaName,
-            'kategori' => $this->newkriteriaKategori,
-            'bobot' => $this->newkriteriaBobot,
-            'keterangan' => $this->newkriteriaKeterangan,
-        ]);
-
-        $this->createModal = false;
-        $this->success('Kriteria created successfully.', position: 'toast-top');
-    }
-
-    public function edit($id): void
-    {
-        $this->editingkriteria = Kriteria::find($id);
-
-        if ($this->editingkriteria) {
-            $this->editingName = $this->editingkriteria->name;
-            $this->editingKategori = $this->editingkriteria->kategori;
-            $this->editingBobot = $this->editingkriteria->bobot;
-            $this->editingKeterangan = $this->editingkriteria->keterangan;
-            $this->editModal = true;
-        }
-    }
-
-    public function saveEdit(): void
-    {
-        if ($this->editingkriteria) {
-            $this->editingkriteria->update([
-                'name' => $this->editingName,
-                'kategori' => $this->editingKategori,
-                'bobot' => $this->editingBobot,
-                'keterangan' => $this->editingKeterangan,
-                'updated_at' => now(),
-            ]);
-
-            $this->editModal = false;
-            $this->success('Kriteria updated successfully.', position: 'toast-top');
-        }
+    
+        $this->warning("Kriteria {$kategori->name} akan dihapus", position: 'toast-top');
     }
 
     public function headers(): array
@@ -176,7 +131,7 @@ new class extends Component {
         <x-table :headers="$headers" :rows="$kriterias" :sort-by="$sortBy" with-pagination
             link="kriteria/{id}/edit?name={name}">
             @scope('actions', $kriterias)
-            <x-button icon="o-trash" wire:click="delete({{ $kriterias['id'] }})"
+            <x-button icon="o-trash" wire:click.stop="delete({{ $kriterias['id'] }})"
                 wire:confirm="Yakin ingin menghapus {{ $kriterias['name'] }}?" spinner
                 class="btn-ghost btn-sm text-red-500" />
             @endscope

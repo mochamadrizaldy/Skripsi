@@ -49,8 +49,28 @@ new class extends Component {
     public function delete($id): void
     {
         $cafe = Cafe::findOrFail($id);
+    
+        // Cek apakah Cafe masih memiliki data alternatif
+        if ($cafe->alternatifs()->exists()) {
+            $this->error("Cafe {$cafe->name} tidak dapat dihapus karena masih memiliki data Alternatif.", position: 'toast-top');
+            return;
+        }
+    
+        // Hapus semua rangking jika ada (misalnya score = 0)
+        if ($cafe->rangking()->exists()) {
+            $rangkingWithNonZero = $cafe->rangking()->where('score', '!=', 0)->exists();
+            if ($rangkingWithNonZero) {
+                $this->error("Cafe {$cafe->name} tidak dapat dihapus karena masih memiliki Rangking dengan skor tidak nol.", position: 'toast-top');
+                return;
+            }
+    
+            // Hapus semua rangking dengan score = 0
+            $cafe->rangking()->delete();
+        }
+    
+        // Hapus Cafe jika aman
         $cafe->delete();
-        $this->warning("Cafe {$cafe->name} dihapus", position: 'toast-top');
+        $this->success("Cafe {$cafe->name} berhasil dihapus.", position: 'toast-top');
     }
 
     public function create(): void
@@ -184,7 +204,7 @@ new class extends Component {
                 <x-avatar image="{{ $cafes['gambar'] ?? '/default.jpg' }}" class="!w-10" />
             @endscope
             @scope('actions', $cafes)
-                <x-button icon="o-trash" wire:click="delete({{ $cafes['id'] }})"
+                <x-button icon="o-trash" wire:click.stop="delete({{ $cafes['id'] }})"
                     wire:confirm="Yakin ingin menghapus cafe {{ $cafes['name'] }}?" spinner
                     class="btn-ghost btn-sm text-red-500" />
             @endscope
