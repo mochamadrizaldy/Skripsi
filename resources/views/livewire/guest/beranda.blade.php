@@ -30,16 +30,18 @@ new #[Layout('components.layouts.beranda')] #[Title('Beranda')] class extends Co
         <div class="flex-1 text-xs text-black px-4 mb-6 md:mb-0 text-center md:text-left">
             <p>
                 Sistem rekomendasi ini dirancang untuk membantu pengguna menemukan cafe terbaik untuk mengerjakan tugas.
-                Sistem ini mempertimbangkan berbagai kriteria seperti kecepatan internet, ketersediaan colokan listrik,
-                harga, suasana, jam operasional, pelayanan, jarak (yang dihitung otomatis menggunakan GPS), dan variasi
-                menu. Berdasarkan preferensi yang dipilih pengguna, sistem akan menampilkan daftar alternatif cafe yang
+                Berdasarkan preferensi yang dipilih pengguna, sistem akan menampilkan daftar alternatif cafe yang
                 paling sesuai dan relevan.
             </p>
         </div>
         <!-- Right: Gray Box -->
         <div class="flex-1 flex justify-center">
-            <div class="w-40 h-32 sm:w-56 sm:h-48 bg-gray-200"></div>
+            <div class="w-40 h-32 sm:w-56 sm:h-48 overflow-hidden rounded">
+                <img src="{{ asset('template/img/CARI CAFFE2.PNG') }}" alt="Cari Cafe"
+                    class="w-full h-full object-contain" />
+            </div>
         </div>
+
     </div>
 
     <!-- Section: Jumlah Data -->

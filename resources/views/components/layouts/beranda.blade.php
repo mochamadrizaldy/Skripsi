@@ -2,6 +2,11 @@
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 
 <head>
+    <!-- PWA  -->
+    <meta name="theme-color" content="#6777ef" />
+    <link rel="apple-touch-icon" href="{{ asset('logo.png') }}">
+    <link rel="manifest" href="{{ asset('/manifest.json') }}">
+
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
     <meta name="csrf-token" content="{{ csrf_token() }}">
@@ -31,6 +36,7 @@
 </head>
 
 <body class="min-h-screen font-sans antialiased bg-[#FCF9F4]">
+
     <x-main>
         <x-slot:content>
             <div class="container mx-auto px-4 py-6">
@@ -39,7 +45,10 @@
                 <div x-data="{ sidebarOpen: false }" class="w-full">
                     {{-- Navbar Mobile Only --}}
                     <div class="flex items-center justify-between bg-[#0B0B15] text-white h-14 px-4 md:hidden">
-                        <a href="/" class="text-white font-italiana text-lg">CARI CAFE</a>
+                        <a href="/" class="inline-block">
+                            <img src="{{ asset('template/img/CARI CAFFE2.PNG') }}" alt="" class="h-8">
+                        </a>
+
 
                         <button @click="sidebarOpen = !sidebarOpen" class="focus:outline-none">
                             <!-- Hamburger Icon -->
@@ -53,10 +62,12 @@
 
 
                     {{-- Desktop Navbar --}}
-                    <div class="hidden md:flex w-full flex-row items-center justify-between mb-8 max-w-4xl mx-auto">
+                    <div class="hidden md:flex w-full flex-row items-center justify-center mb-8 px-4">
                         <div
                             class="bg-[#0B0B15] rounded-full flex w-full max-w-4xl h-10 items-center justify-between px-2 sm:px-4 md:px-6">
-                            <a href="/" class="text-sm text-white px-2 py-1 font-italiana">CARI CAFE</a>
+                            <a href="/" class="inline-block">
+                                <img src="{{ asset('template/img/CARI CAFFE2.PNG') }}" alt="Logo" class="h-10">
+                            </a>
 
                             <div class="flex items-center space-x-2">
                                 <a href="/" class="text-sm text-white px-7 py-1">Home Page</a>
@@ -92,6 +103,9 @@
                             @endif
                         </div>
                     </div>
+
+
+
 
                     {{-- Mobile Sidebar --}}
                     <div x-show="sidebarOpen" @click.away="sidebarOpen = false"
@@ -132,7 +146,23 @@
             </div>
         </x-slot:content>
     </x-main>
-
+    <script src="{{ asset('/sw.js') }}"></script>
+    <script>
+        if ("serviceWorker" in navigator) {
+            // Register a service worker hosted at the root of the
+            // site using the default scope.
+            navigator.serviceWorker.register("/sw.js").then(
+                (registration) => {
+                    console.log("Service worker registration succeeded:", registration);
+                },
+                (error) => {
+                    console.error(`Service worker registration failed: ${error}`);
+                },
+            );
+        } else {
+            console.error("Service workers are not supported.");
+        }
+    </script>
     {{-- TOAST area --}}
     <x-toast />
 

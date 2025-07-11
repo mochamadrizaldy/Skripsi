@@ -26,7 +26,7 @@ new #[Layout('components.layouts.beranda')] #[Title('Beranda')] class extends Co
             $this->resetPage();
         }
     }
-    
+
     public function haversineDistance($lat1, $lon1, $lat2, $lon2): float
     {
         $earthRadius = 6371; // in kilometers
@@ -65,45 +65,51 @@ new #[Layout('components.layouts.beranda')] #[Title('Beranda')] class extends Co
             'rankings' => $this->rankings,
         ];
     }
-
 };
 ?>
 
 <div class="min-h-screen w-full max-w-6xl px-4 py-6 mx-auto">
     <h2 class="text-2xl font-bold mb-6 text-center text-black">Daftar Ranking Cafe Di Sekitar Polinema</h2>
     <div class="grid grid-cols-1 md:grid-cols-8 gap-4 items-end mb-4">
-
         <div class="md:col-span-8">
-            <x-input placeholder="Search..." wire:model.live.debounce="search" clearable icon="o-magnifying-glass"
-                class="" />
+            <div class="relative">
+                <input type="text" placeholder="Search..." wire:model.live.debounce.300ms="search"
+                    class="w-full px-4 py-2 pr-10 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:outline-none bg-white text-gray-800" />
+                <!-- Icon search -->
+                <div class="absolute inset-y-0 right-3 flex items-center pointer-events-none">
+                    <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" stroke-width="2"
+                        viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 103.75 3.75a7.5 7.5 0 0012.9 12.9z" />
+                    </svg>
+                </div>
+            </div>
         </div>
-        <!-- Dropdown untuk jumlah data per halaman -->
     </div>
-    <!-- Box dummy -->
-    <div class="flex justify-center my-10">
-        <div class="w-56 h-32 bg-gray-200"></div>
-    </div>
+
 
     <div class="bg-white rounded-xl shadow-md px-6 py-10">
-        <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-6">
-            @foreach ($rankings as $ranking)
-                @php $cafe = $ranking->cafe; @endphp
-                <div class="bg-[#FCF9F4] rounded-lg shadow p-4 cursor-pointer transition hover:scale-105"
-                    wire:click="showDetail({{ $cafe->id }})">
-                    <img src="{{ asset($cafe->gambar) }}" alt="{{ $cafe->name }}"
-                        class="w-full h-32 object-cover rounded mb-3">
-                    <h3 class="text-lg font-bold">{{ $cafe->name }}</h3>
-                    <p class="text-sm">Peringkat: {{ $ranking->peringkat }}</p>
-                    <p class="text-sm">Sosmed: {{ $cafe->sosmed }}</p>
-                    <p class="text-sm">Latitude: {{ $cafe->latitude }}</p>
-                    <p class="text-sm">Longitude: {{ $cafe->longitude }}</p>
-                    <p class="text-sm">
-                        Jarak:
-                        {{ number_format($this->haversineDistance($originLat, $originLng, $cafe->latitude, $cafe->longitude), 2) }}
-                        km
-                    </p>
-                </div>
-            @endforeach
+        <div class="w-full max-w-screen-xl mx-auto px-4 py-6">
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                @foreach ($rankings as $ranking)
+                    @php $cafe = $ranking->cafe; @endphp
+                    <div class="bg-[#FCF9F4] rounded-lg shadow p-4 cursor-pointer transition hover:scale-105"
+                        wire:click="showDetail({{ $cafe->id }})">
+                        <img src="{{ asset($cafe->gambar) }}" alt="{{ $cafe->name }}"
+                            class="w-full h-32 object-cover rounded mb-3">
+                        <h3 class="text-lg font-bold">{{ $cafe->name }}</h3>
+                        <p class="text-sm">Peringkat: {{ $ranking->peringkat }}</p>
+                        <p class="text-sm">Sosmed: {{ $cafe->sosmed }}</p>
+                        <p class="text-sm">Latitude: {{ $cafe->latitude }}</p>
+                        <p class="text-sm">Longitude: {{ $cafe->longitude }}</p>
+                        <p class="text-sm">
+                            Jarak:
+                            {{ number_format($this->haversineDistance($originLat, $originLng, $cafe->latitude, $cafe->longitude), 2) }}
+                            km
+                        </p>
+                    </div>
+                @endforeach
+            </div>
         </div>
 
         <!-- Custom Pagination -->
@@ -164,8 +170,6 @@ new #[Layout('components.layouts.beranda')] #[Title('Beranda')] class extends Co
                             {{ number_format($this->haversineDistance($originLat, $originLng, $selectedCafe->latitude, $selectedCafe->longitude), 2) }}
                             km
                         </p>
-
-
 
                         <hr class="my-2">
 
