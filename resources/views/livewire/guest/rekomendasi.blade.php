@@ -15,6 +15,17 @@ new #[Layout('components.layouts.beranda')] #[Title('Rekomendasi')] class extend
     public float $userLat = -7.94666; // default Malang
     public float $userLng = 112.6145;
     public bool $gpsUsed = false;
+    public bool $detailModal = false;
+    public ?Cafe $selectedCafe = null;
+
+    public function showDetail($id): void
+    {
+        $this->selectedCafe = Cafe::with('alternatifs.kriteria.sub_kriteria')->find($id);
+
+        if ($this->selectedCafe) {
+            $this->detailModal = true;
+        }
+    }
 
     public function clear(): void
     {
@@ -328,7 +339,8 @@ new #[Layout('components.layouts.beranda')] #[Title('Rekomendasi')] class extend
         <div class="w-full bg-[#EDE1D4] rounded-xl px-4 py-10 shadow">
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 justify-items-center">
                 @forelse ($cafes as $cafe)
-                    <div class="w-64 h-60 bg-[#FCF9F4] rounded-lg shadow-md flex flex-col items-center p-3">
+                    <div class="w-64 h-60 bg-[#FCF9F4] rounded-lg shadow-md flex flex-col items-center p-3 cursor-pointer transition hover:scale-105"
+                        wire:click="showDetail({{ $cafe->id }})">
                         <img src="{{ asset($cafe->gambar) }}" alt="{{ $cafe->name }}"
                             class="w-full h-32 object-cover rounded mb-2">
                         <p class="text-sm font-bold text-center">{{ $cafe->name }}</p>
@@ -344,4 +356,63 @@ new #[Layout('components.layouts.beranda')] #[Title('Rekomendasi')] class extend
             </div>
         </div>
     </div>
+
+    @if ($detailModal)
+        <!-- Modal Overlay -->
+        <div class="fixed inset-0 bg-black bg-opacity-40 z-50 flex items-center justify-center">
+            <!-- Modal Container -->
+            <div
+                class="bg-white w-full max-w-md rounded-xl shadow-lg overflow-hidden max-h-[90vh] flex flex-col relative animate-fade-in">
+                <!-- Close Button -->
+                <button wire:click="$set('detailModal', false)"
+                    class="absolute top-3 right-3 text-gray-500 hover:text-red-500 transition">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+
+                <!-- Modal Header -->
+                <div class="px-6 py-4 border-b">
+                    <h3 class="text-lg font-semibold">Detail Cafe</h3>
+                </div>
+
+                <!-- Modal Body -->
+                <div class="px-6 py-4 overflow-y-auto flex-1">
+                    @if ($selectedCafe)
+                        <img src="{{ asset($selectedCafe->gambar) }}"
+                            class="h-48 w-full object-cover rounded-lg mb-4" />
+                        <p><strong>Nama:</strong> {{ $selectedCafe->name }}</p>
+                        <p><strong>Sosmed:</strong> {{ $selectedCafe->sosmed }}</p>
+                        <p><strong>Latitude:</strong> {{ $selectedCafe->latitude }}</p>
+                        <p><strong>Longitude:</strong> {{ $selectedCafe->longitude }}</p>
+
+                        <hr class="my-2">
+
+                        <h4 class="font-semibold">Detail Penilaian</h4>
+                        <ul class="list-disc pl-5 space-y-1">
+                            @foreach ($selectedCafe->alternatifs as $alt)
+                                <li>
+                                    <strong>{{ $alt->kriteria->name }}:</strong>
+                                    @php
+                                        $sub = $alt->kriteria->sub_kriteria->firstWhere('nilai', $alt->value);
+                                    @endphp
+                                    <span>{{ $sub?->name ?? 'Tidak ada data' }}</span>
+                                </li>
+                            @endforeach
+                        </ul>
+                    @endif
+                </div>
+
+                <!-- Modal Footer -->
+                <div class="px-6 py-3 border-t flex justify-end">
+                    <button wire:click="$set('detailModal', false)"
+                        class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition">
+                        Tutup
+                    </button>
+                </div>
+            </div>
+        </div>
+    @endif
 </div>

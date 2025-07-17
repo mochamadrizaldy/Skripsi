@@ -1,11 +1,11 @@
 {
     "name": "Cari Cafe",
-    "short_name": "SRCC",
+    "short_name": "Cari Cafe",
     "start_url": "/index.php",
-    "background_color": "#6777ef",
+    "background_color": "#55372B",
     "description": "Sistem rekomendasi cafe menggunakan GPS",
     "display": "fullscreen",
-    "theme_color": "#6777ef",
+    "theme_color": "#55372B",
     "icons": [
         {
             "src": "logo.png",
